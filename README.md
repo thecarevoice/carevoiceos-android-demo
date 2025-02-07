@@ -38,8 +38,8 @@ dependencies {
 
 
 ## 3. 在 Activity 中初始化 SDK
-
 在 Activity 中初始化 SDK 并启动 HubViewActivity：
+//Authorization 为token 
 
 ```
 val header = hashMapOf<String, String>().apply {
