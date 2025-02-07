@@ -17,7 +17,7 @@ dependencyResolutionManagement {
         maven(url = "https://maven.lokalise.com")
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
-            // 上传服务器的账户密码
+            //maven服务器账号密码
             credentials {
                 username = "Your username"
                 password = "Your password"
