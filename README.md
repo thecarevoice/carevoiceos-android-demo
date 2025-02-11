@@ -13,7 +13,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(url = "https://maven.lokalise.com")
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
             //maven服务器账号密码
