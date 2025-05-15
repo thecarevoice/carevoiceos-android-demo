@@ -28,32 +28,25 @@ dependencyResolutionManagement {
 ## 2.在项目build.gradle.kts中(app/build.gradle.kts) 添加
 ```
 dependencies {
-    implementation("com.carevoice.mindfullness:mindfullness:0.5.0-SNAPSHOT")
+    implementation("com.carevoice.mindfullness:mindfullness:0.8.0-SNAPSHOT")
     ....
 }
 ```
 
+# 3. 在Application 中初始化SDK
+```
+WellnessSDK.initSDK(application)
+```
 
 
-## 3. 在 Activity 中初始化 SDK
+##4. 在 Activity 中初始化SDK相关参数
 在 Activity 中初始化 SDK 并启动 HubViewActivity：
 //Authorization 为token 
 
 ```
-val header = hashMapOf<String, String>().apply {
-    put("Locale", "US")
-    put("Time-Zone", TimeZone.getDefault().id)
-    put("Agent", "Android")
-    put("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijc5Mzg3MjNmNiJ9.eyJhdWQiOiI0YWEyMmRmYi1lNmQ3LTRiODQtOWYyNy1mNGYxMjljNmEyZmYiLCJleHAiOjE3MzgwNTYyMjksImlhdCI6MTczNzk2OTgyOSwiaXNzIjoiYWNtZS5jb20iLCJzdWIiOiI4NWZlYjI4Ny0xZDZhLTRkNDYtYjY1Ny01ZDQ0NGZiMTNkNzQiLCJqdGkiOiI3ZTNkNGM3Yi0wYWU2LTQwNzktOTQ0YS1mNGMxYzFmNTJmZDIiLCJhdXRoZW50aWNhdGlvblR5cGUiOiJQQVNTV09SRCIsImVtYWlsIjoiYXV0bzUwMDY5QHFxLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhcHBsaWNhdGlvbklkIjoiNGFhMjJkZmItZTZkNy00Yjg0LTlmMjctZjRmMTI5YzZhMmZmIiwicm9sZXMiOltdLCJhdXRoX3RpbWUiOjE3Mzc5Njk4MjksInRpZCI6IjZmYmI0YmUxLWVjZjgtNGNmMC05YWUyLTdkYjg4NDI2MjA4YSJ9.FJNEjtJNSFP6hJKAP830Q5mz1nJ3FlNm2rVv3PQlYKk")
-    put("Version", "0.5.0")
-    put("Accept-Encoding", "gzip")
-    put("Lang", "en")
-}
-
-//协程
-lifecycleScope.launch {
-    MindfulnessSDK.init(this@MainActivity, "https://p2-stag.kangyu.info/", header)
-}
-//启动对应Activity
-MindfulnessConfig.startHubViewActivity(this@MainActivity)
+                WellnessSDK.setBaseUrl(NetUtils.getBaseUrl()).setToken("your token")
+                    .setRefreshToken("your refresh token")
+                    .setExpiresIn(" expiresIn ").setTenantCode("your tenant Code").init(ctx) {
+                    WellnessTool.startHubViewActivity(ctx)
+                }
 ```
