@@ -22,8 +22,8 @@ dependencyResolutionManagement {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
             //上传服务器的账户密码
             credentials {
-                username = "cvpartner"
-                password = "wVSmP7GU8z"
+                username = "replace_me"
+                password = "replace_me"
             }
         }
     }

@@ -1,12 +1,12 @@
 # CV Wellness SDK Android
 
-# Android SDK 使用步骤
+# Android SDK Usage Steps
 
-## 1. 添加目标 Maven 仓库
+## 1. Add the Target Maven Repository
 
-1. 打开 Android Studio 项目或工作空间。
+1. Open your Android Studio project or workspace.
 
-根目录 settings.gradle.tks
+In the root `settings.gradle.kts`:
 ```
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -15,7 +15,7 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
-            //maven服务器账号密码
+            //maven server username and password
             credentials {
                 username = "Your username"
                 password = "Your password"
@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 }
 ```
 
-## 2.在项目build.gradle.kts中(app/build.gradle.kts) 添加
+## 2. Add the dependency in your project's `build.gradle.kts` (app/build.gradle.kts)
 ```
 dependencies {
     implementation("com.carevoice.mindfullness:mindfullness:0.8.0-SNAPSHOT")
@@ -33,15 +33,15 @@ dependencies {
 }
 ```
 
-# 3. 在Application 中初始化SDK
+# 3. Initialize the SDK in your Application class
 ```
 WellnessSDK.initSDK(application)
 ```
 
 
-##4. 在 Activity 中初始化SDK相关参数
-在 Activity 中初始化 SDK 并启动 HubViewActivity：
-//Authorization 为token 
+## 4. Initialize SDK parameters in your Activity
+Initialize the SDK in your Activity and start `HubViewActivity`:
+// `Authorization` is the token
 
 ```
                 WellnessSDK.setBaseUrl(NetUtils.getBaseUrl()).setToken("your token")
