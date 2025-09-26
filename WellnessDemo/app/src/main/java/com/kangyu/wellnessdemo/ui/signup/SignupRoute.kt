@@ -37,8 +37,12 @@ import com.carevoice.cvdesign.clickable
 import com.carevoice.mindfulnesslibrary.WellnessSDK
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
+import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
 import com.kangyu.wellnessdemo.net.NetUtils
 import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
+import android.widget.Toast
+import com.carevoice.cvdesign.designsystem.CommonLoadingDialog
+import com.carevoice.cvdesign.designsystem.theme.CommonTheme
 
 @Composable
 fun SignupRoute(
@@ -55,24 +59,46 @@ fun SignupRoute(
             DataState.Loading -> {
                 // Handle loading state
             }
-
+            
             is DataState.Success -> {
-                // Handle success state
-                composeNavigator.popBackStack()
-
+                // Handle success state - show success message and navigate to login
+                Toast.makeText(ctx, "Registration successful! Please login.", Toast.LENGTH_SHORT).show()
+                
+                // Reset the signup state to avoid repeated navigation
+                signupViewModel.resetState()
+                
+                // Navigate to login screen
+                navHostController.navigate(CareVoiceScreens.Login.route) {
+                    // Clear the signup screen from back stack
+                    popUpTo(CareVoiceScreens.SignUp.route) {
+                        inclusive = true
+                    }
+                }
             }
 
             is DataState.Error -> {
                 // Handle error state
+                val errorMessage = (state as DataState.Error).message
+                Toast.makeText(ctx, "Registration failed: $errorMessage", Toast.LENGTH_LONG).show()
+                signupViewModel.resetState()
             }
-            else ->{
-
+            
+            DataState.Idle -> {
+                // Idle state - do nothing
             }
         }
     }
+    
     RegisterPage(onClick = { userName, password ->
         signupViewModel.signup(userName, password)
     })
+    
+    // Show loading dialog when in loading state
+    if (state is DataState.Loading) {
+        CommonTheme { 
+            CommonLoadingDialog()
+        }
+    }
 }
 
 @Composable

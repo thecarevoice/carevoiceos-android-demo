@@ -41,9 +41,11 @@ import com.carevoice.mindfulnesslibrary.WellnessSDK
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
 import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
+import com.kangyu.wellnessdemo.net.CareVoiceOS
 import com.kangyu.wellnessdemo.net.NetUtils
 import com.kangyu.wellnessdemo.ui.login.vm.LoginViewModel
 import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
+import com.kangyu.wellnessdemo.utils.JwtUtils
 
 @Composable
 fun LoginRoute(
@@ -66,10 +68,40 @@ fun LoginRoute(
             is DataState.Success -> {
                 // Handle success state
                 val data = (state as DataState.Success).data
-                WellnessSDK.setBaseUrl(NetUtils.getBaseUrl()).setToken(data.sdk.accessToken)
-                    .setRefreshToken(data.sdk.refreshToken)
-                    .setExpiresIn(data.sdk.expiresIn.toLong()).setTenantCode("C7T1JxIX").init(ctx) {
-                    WellnessTool.startHubViewActivity(ctx)
+                
+                // 打印完整的data.sdk信息用于调试
+                Log.d("LoginRoute", "Login Success - SDK Data:")
+                Log.d("LoginRoute", "  accessToken: ${data.sdk.accessToken}")
+                Log.d("LoginRoute", "  refreshToken: ${data.sdk.refreshToken}")
+                Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
+                
+                // retrieve tenant code from access token
+                val tenantCode = JwtUtils.getTenantCodeFromJwt(data.sdk.accessToken)
+                Log.d("LoginRoute", "  parsed tenantCode: $tenantCode")
+                
+                // 也打印JWT解析的完整内容
+                val jwtObj = JwtUtils.parseJwt(data.sdk.accessToken)
+                Log.d("LoginRoute", "  JWT payload: $jwtObj")
+                
+                if (tenantCode != null) {
+                    // 设置CareVoice SDK的生产环境URL
+                    val careVoiceBaseUrl = "https://apis.carevoiceos.com"
+                    Log.d("LoginRoute", "Initializing WellnessSDK with:")
+                    Log.d("LoginRoute", "  baseUrl: $careVoiceBaseUrl")
+                    Log.d("LoginRoute", "  tenantCode: $tenantCode")
+                    Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
+                    
+                    WellnessSDK.setBaseUrl(careVoiceBaseUrl).setToken(data.sdk.accessToken)
+                        .setRefreshToken(data.sdk.refreshToken)
+                        .setExpiresIn(data.sdk.expiresIn.toLong())
+                        .setTenantCode(tenantCode).init(ctx) {
+                            Log.d("LoginRoute", "WellnessSDK init success, starting HubViewActivity")
+                            WellnessTool.startHubViewActivity(ctx)
+                    }
+                } else {
+                    Toast.makeText(ctx, "Failed to get tenant code from token", Toast.LENGTH_SHORT).show()
+                    Log.e("LoginRoute", "Failed to parse tenant code from JWT token")
+                    Log.e("LoginRoute", "JWT token: ${data.sdk.accessToken}")
                 }
 //                viewModel.resetLoginState()
             }

@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SignupViewModel:ViewModel() {
 
-    private val _signupState = MutableStateFlow<DataState<LoginResponse>>(DataState.Loading)
+    private val _signupState = MutableStateFlow<DataState<LoginResponse>>(DataState.Idle)
      val signupState = _signupState.asStateFlow()
 
     fun signup(username: String, password: String) {
@@ -21,6 +21,7 @@ class SignupViewModel:ViewModel() {
        val apiService =  NetUtils.getApiService()
         viewModelScope.launch {
             try {
+                _signupState.value = DataState.Loading
                 val response = apiService.register(LoginRequest(username, password))
                 if (response.success && response.data != null) {
                     _signupState.value = DataState.Success(response.data!!)
@@ -35,7 +36,7 @@ class SignupViewModel:ViewModel() {
     }
 
     fun resetState(){
-        _signupState.value = DataState.Loading
+        _signupState.value = DataState.Idle
     }
 
 }
