@@ -16,7 +16,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(url="https://maven.lokalise.com")
         maven ( url ="https://jitpack.io" )
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")

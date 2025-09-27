@@ -41,9 +41,10 @@ class MainActivity : ComponentActivity() {
             WellnessDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(), snackbarHost = {
                 }) { innerPadding ->
+                    innerPadding
                     Column(
                         modifier = Modifier
-                            .padding(innerPadding)
+//                            .padding(innerPadding)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally

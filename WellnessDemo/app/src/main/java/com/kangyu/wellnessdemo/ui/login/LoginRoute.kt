@@ -3,6 +3,7 @@ package com.kangyu.wellnessdemo.ui.login
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
-import com.carevoice.cvdesign.clickable
 import com.carevoice.cvdesign.designsystem.CommonLoadingDialog
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
 import com.carevoice.mindfulnesslibrary.WellnessSDK
@@ -90,12 +90,15 @@ fun LoginRoute(
         navHostController.navigate(CareVoiceScreens.SignUp.route)
     }, onClick = { username, password ->
         viewModel.login(username, password)
+    }, gotoMain = {
+        navHostController.navigate(CareVoiceScreens.Main.route)
     })
+
     if (state is DataState.Loading) CommonTheme{ CommonLoadingDialog()}
 }
 
 @Composable
-fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit) {
+fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit,gotoMain: () -> Unit) {
     var username by remember { mutableStateOf("mingxiang.luo@thecarevoice.com") }
     var password by remember { mutableStateOf("12345678") }
 
@@ -142,6 +145,14 @@ fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = { gotoMain.invoke() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            Text(text = "Goto Main")
+        }
 
         Text(
             text = "Don't have an account? Register",
@@ -156,5 +167,7 @@ fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit) {
 @Preview
 @Composable
 fun LoginPagePreview() {
-    LoginPage(gotoRegister = {}, onClick = { _, _ -> })
+    LoginPage(gotoRegister = {}, onClick = { _, _ -> },{
+
+    })
 }

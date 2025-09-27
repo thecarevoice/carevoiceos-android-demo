@@ -11,6 +11,8 @@ sealed class CareVoiceScreens(
 
     object Login : CareVoiceScreens("Login")
     object SignUp : CareVoiceScreens("SignUp")
+    object Main : CareVoiceScreens("Main")
+
 }
 
 private fun String.appendArguments(navArguments: List<NamedNavArgument>): String {
