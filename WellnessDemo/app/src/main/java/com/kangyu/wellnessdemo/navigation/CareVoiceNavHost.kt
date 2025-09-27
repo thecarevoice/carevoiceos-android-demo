@@ -15,6 +15,7 @@ import com.carevoice.mindfulnesslibrary.navigation.articlesListNavigation
 import com.carevoice.mindfulnesslibrary.navigation.vm.SharedViewModel
 import com.carevoice.mindfulnesslibrary.navigation.wellnessNavigation
 import com.kangyu.wellnessdemo.ui.login.LoginRoute
+import com.kangyu.wellnessdemo.ui.main.MainHome
 import com.kangyu.wellnessdemo.ui.signup.SignupRoute
 
 @Composable
@@ -37,12 +38,17 @@ fun CareVoiceNavHost(
             SignupRoute(navHostController, composeNavigator, scaffoldState)
         }
 
-
         composable(
             route = CareVoiceScreens.Login.route
         ) {
             LoginRoute(navHostController, composeNavigator, scaffoldState)
         }
 
+
+    composable(
+            route = CareVoiceScreens.Main.route
+        ) {
+            MainHome(navHostController, composeNavigator, scaffoldState)
+        }
     }
 }
