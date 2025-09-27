@@ -28,7 +28,7 @@ dependencyResolutionManagement {
 ## 2. Add the dependency in your project's `build.gradle.kts` (app/build.gradle.kts)
 ```
 dependencies {
-    implementation("com.carevoice.mindfullness:mindfullness:0.8.0-SNAPSHOT")
+    implementation("com.carevoice.mindfullness:mindfullness:0.11.1-SNAPSHOT")
     ....
 }
 ```
