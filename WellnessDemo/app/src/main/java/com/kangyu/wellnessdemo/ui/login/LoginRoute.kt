@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.carevoice.activitytracking.global.Global
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
 import com.carevoice.cvdesign.designsystem.CommonLoadingDialog
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
@@ -64,6 +66,8 @@ import com.kangyu.wellnessdemo.net.NetUtils
 import com.kangyu.wellnessdemo.ui.login.vm.LoginViewModel
 import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
 import com.kangyu.wellnessdemo.utils.JwtUtils
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginRoute(
@@ -76,6 +80,7 @@ fun LoginRoute(
     val state by viewModel.loginState.collectAsState()
     val ctx = LocalContext.current
     var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(state) {
         when (state) {
@@ -86,7 +91,6 @@ fun LoginRoute(
             is DataState.Success -> {
                 // Handle success state
                 val data = (state as DataState.Success).data
-                
                 // 打印完整的data.sdk信息用于调试
                 Log.d("LoginRoute", "Login Success - SDK Data:")
                 Log.d("LoginRoute", "  accessToken: ${data.sdk.accessToken}")
@@ -108,19 +112,20 @@ fun LoginRoute(
                     Log.d("LoginRoute", "  baseUrl: $careVoiceBaseUrl")
                     Log.d("LoginRoute", "  tenantCode: $tenantCode")
                     Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
-                    // 根据登录跳转规范：登录成功后跳转至MainHome页面，并清除登录页栈记录
 
                     WellnessSDK.setBaseUrl(careVoiceBaseUrl).setToken(data.sdk.accessToken)
                         .setRefreshToken(data.sdk.refreshToken)
                         .setExpiresIn(data.sdk.expiresIn.toLong())
                         .setTenantCode(tenantCode).init(ctx) {
                             Log.d("LoginRoute", "WellnessSDK init success")
+                            scope.launch {
+                                navHostController.navigate(CareVoiceScreens.Main.route) {
+                                    popUpTo(CareVoiceScreens.Login.route) { inclusive = true }
+                                }
+                            }
                     }
 
-                    navHostController.navigate(CareVoiceScreens.Main.route) {
-                        // 清除登录页面的历史记录，防止用户返回
-                        popUpTo(CareVoiceScreens.Login.route) { inclusive = true }
-                    }
+
                 } else {
                     Toast.makeText(ctx, "Failed to get tenant code from token", Toast.LENGTH_SHORT).show()
                     Log.e("LoginRoute", "Failed to parse tenant code from JWT token")
@@ -149,7 +154,7 @@ fun LoginRoute(
         navHostController.navigate(CareVoiceScreens.Main.route)
     })
 
-    if (state is DataState.Loading) CommonTheme{ CommonLoadingDialog()}
+    if (state is DataState.Loading || state is DataState.Success) CommonTheme{ CommonLoadingDialog()}
 }
 
 @Composable

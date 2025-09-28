@@ -11,7 +11,7 @@ object NetUtils {
         .build()
 
     fun getBaseUrl(): String {
-        return "https://apis.carevoiceos.com"
+        return "http://10.0.2.2:3005"
     }
 
     fun getApiService(): ApiService {
