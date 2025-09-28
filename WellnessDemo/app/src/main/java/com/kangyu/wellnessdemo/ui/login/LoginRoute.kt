@@ -159,7 +159,7 @@ fun LoginRoute(
 
 @Composable
 fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit, gotoMain: () -> Unit) {
-    var username by remember { mutableStateOf("mingxiang.luo@thecarevoice.com") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("12345678") }
     var passwordVisible by remember { mutableStateOf(false) }
 

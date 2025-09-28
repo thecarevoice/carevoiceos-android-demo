@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class SignupViewModel:ViewModel() {
 
-    private val _signupState = MutableStateFlow<DataState<LoginResponse>>(DataState.Idle)
+    private val _signupState = MutableStateFlow<DataState<Boolean>>(DataState.Idle)
      val signupState = _signupState.asStateFlow()
 
     fun signup(username: String, password: String) {
@@ -23,8 +23,8 @@ class SignupViewModel:ViewModel() {
             try {
                 _signupState.value = DataState.Loading
                 val response = apiService.register(LoginRequest(username, password))
-                if (response.success && response.data != null) {
-                    _signupState.value = DataState.Success(response.data!!)
+                if (response.success) {
+                    _signupState.value = DataState.Success(true)
                 }else{
                     _signupState.value = DataState.Error(response.message)
                 }
