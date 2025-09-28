@@ -58,7 +58,7 @@ dependencies {
         resolutionStrategy.cacheChangingModulesFor(1, "seconds")
     }
 
-    implementation("com.carevoice.wellness:wellness:0.10.1-SNAPSHOT")
+    implementation("com.carevoice.wellness:wellness:0.11.1-SNAPSHOT")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
