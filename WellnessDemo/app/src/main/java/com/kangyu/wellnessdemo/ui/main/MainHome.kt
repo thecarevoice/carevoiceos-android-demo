@@ -1,5 +1,9 @@
 package com.kangyu.wellnessdemo.ui.main
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +31,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +52,11 @@ import com.carevoice.cvdesign.designsystem.modifier.containWindowInseTop
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.bridgeview.WellnessMainScreen
+import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
+import com.kangyu.wellnessdemo.net.bean.DeepLinkRequest
+import com.kangyu.wellnessdemo.ui.login.vm.LoginViewModel
+import com.kangyu.wellnessdemo.utils.PkceUtil
+import com.kangyu.wellnessdemo.utils.WellnessDemoConst
 //import com.carevoice.mindfulnesslibrary.navigation.WellnessAreaScreens
 //import com.carevoice.mindfulnesslibrary.navigation.WellnessHubScreens
 import kotlinx.coroutines.launch
@@ -62,6 +75,8 @@ fun MainHome(
     composeNavigator: AppComposeNavigator,
     scaffoldState: ScaffoldState
 ) {
+
+
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(0, pageCount = { 3 })
     
@@ -146,6 +161,57 @@ fun BottomNavigationBarPreview() {
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
+    val viewModel = remember { LoginViewModel() }
+    val deepLinkState by viewModel.deepLinkState.collectAsState()
+    val deepLinkValidateState by viewModel.deepLinkValidateState.collectAsState()
+    LaunchedEffect(deepLinkState) {
+        when (deepLinkState) {
+            DataState.Loading -> {
+            }
+            is DataState.Success -> {
+                val data = (deepLinkState as DataState.Success).data
+                //在data.deepLink后面再拼接上？code_verifier=${viewModel.codeVerifier}
+
+
+                val uri = Uri.parse(data.deepLink)
+                val deepLinkAndCodeVerifier = uri.buildUpon()
+                    .appendQueryParameter("code_verifier", viewModel.codeVerifier)
+                    .build()
+                    .toString()
+                val deepLinkAndCodeVerifierUri= Uri.parse(deepLinkAndCodeVerifier)
+                val intent = Intent(Intent.ACTION_VIEW, deepLinkAndCodeVerifierUri)
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    // 处理异常
+                    Toast.makeText(context, "应用未安装", Toast.LENGTH_SHORT).show()
+                }
+//                val code = uri.getQueryParameter("code")
+//
+//              val  deepLinkRequest= DeepLinkRequest(code?:"", viewModel.codeVerifier?:"")
+//                viewModel.validateDeepLink(deepLinkRequest)
+            }
+            else ->{
+
+            }
+        }}
+
+    LaunchedEffect(deepLinkValidateState) {
+        when (deepLinkValidateState) {
+            DataState.Loading -> {
+            }
+            is DataState.Success -> {
+                val data = (deepLinkValidateState as DataState.Success).data
+
+
+                Toast.makeText(context, data.refresh_token, Toast.LENGTH_SHORT).show()
+
+            }
+            else ->{
+
+            }
+        }}
+
 
     Column(
         modifier = Modifier
@@ -209,10 +275,29 @@ fun HomeScreen() {
                     onClick = {
                         // 启动 Wellness SDK
                         WellnessTool.startHubViewActivity(context)
+
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Enter Wellness SDK")
+                }
+
+                Text(
+                    text = "Enter OS3",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Button(
+                    onClick = {
+                        viewModel.deepLink(viewModel.generatePkcePair() ,"S256", WellnessDemoConst.userUniqueId)
+
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Enter OS3")
                 }
             }
         }

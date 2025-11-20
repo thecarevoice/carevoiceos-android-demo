@@ -66,6 +66,7 @@ import com.kangyu.wellnessdemo.net.NetUtils
 import com.kangyu.wellnessdemo.ui.login.vm.LoginViewModel
 import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
 import com.kangyu.wellnessdemo.utils.JwtUtils
+import com.kangyu.wellnessdemo.utils.WellnessDemoConst
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -112,7 +113,7 @@ fun LoginRoute(
                     Log.d("LoginRoute", "  baseUrl: $careVoiceBaseUrl")
                     Log.d("LoginRoute", "  tenantCode: $tenantCode")
                     Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
-
+                    WellnessDemoConst.userUniqueId=data.cvUserUniqueId
                     WellnessSDK.setBaseUrl(careVoiceBaseUrl).setToken(data.sdk.accessToken)
                         .setRefreshToken(data.sdk.refreshToken)
                         .setExpiresIn(data.sdk.expiresIn.toLong())

@@ -20,8 +20,8 @@ dependencyResolutionManagement {
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
             credentials {
-                username = "replace_me"
-                password = "replace_me"
+                username = "developer"
+                password = "T305krNHR5"
             }
         }
     }

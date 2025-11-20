@@ -14,6 +14,10 @@ data class LoginResponse(
     val user: User,
     @SerializedName("token")
     val token: String,
+
+
+    @SerializedName("cvUserUniqueId")
+    val cvUserUniqueId: String,
     @SerializedName("sdk")
     val sdk: Sdk
 )
