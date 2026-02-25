@@ -1,20 +1,27 @@
 package com.kangyu.wellnessdemo
 
+import ai.asleep.asleepsdk.data.UserInfo
 import android.app.Application
-import com.carevoice.mindfulnesslibrary.WellnessSDK
-import com.kangyu.wellnessdemo.net.NetUtils
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.carevoice.mindfulnesslibrary.Wellness
 import java.util.Locale
-import java.util.TimeZone
 
 
 class App: Application() {
     override fun onCreate() {
         super.onCreate()
-        WellnessSDK.initSDK(this)
-        //Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ijc5Mzg3MjNmNiJ9.eyJhdWQiOiI0YWEyMmRmYi1lNmQ3LTRiODQtOWYyNy1mNGYxMjljNmEyZmYiLCJleHAiOjE3NDk3NDYzODQsImlhdCI6MTc0OTczOTE4NCwiaXNzIjoiY2FyZXZvaWNlb3MuY29tIiwic3ViIjoiOWYzYjgyMzMtYWZmOS00ZjdkLWJlNzEtZTdjZmMwNjA1ZTA5IiwianRpIjoiOGM4ODJjYzMtMDgzNy00M2EwLWJhNTQtMTUwZmUwYzg1Y2JiIiwiYXV0aGVudGljYXRpb25UeXBlIjoiUEFTU1dPUkQiLCJlbWFpbCI6IjU1encxMUBxcS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXBwbGljYXRpb25JZCI6IjRhYTIyZGZiLWU2ZDctNGI4NC05ZjI3LWY0ZjEyOWM2YTJmZiIsInJvbGVzIjpbXSwiYXV0aF90aW1lIjoxNzQ5NzM5MTg0LCJ0aWQiOiI2ZmJiNGJlMS1lY2Y4LTRjZjAtOWFlMi03ZGI4ODQyNjIwOGEifQ.uCysXDqCE0jO7P_tPP9AegDEzyqWsVNc5w9W871Ptow
-        WellnessSDK.setBaseUrl(NetUtils.getBaseUrl())
+        initSDK()
+
     }
 
+
+    private fun initSDK() {
+//        if (UserInfo.isLogin()) {
+//            Wellness.setToken(UserInfo.accessToken)
+//        }
+        Wellness.setLocale(Locale.getDefault()).setBaseUrl("http://192.168.28.22:3005/")
+            .initApplication(this@App)
+        Wellness.registerTokenExpiredCallback {
+//            UserInfo.logout()
+        }
+    }
 }

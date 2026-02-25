@@ -11,7 +11,7 @@ object NetUtils {
         .build()
 
     fun getBaseUrl(): String {
-        return "http://10.0.2.2:3005"
+        return "http://192.168.28.22:3005/"
     }
 
     fun getApiService(): ApiService {

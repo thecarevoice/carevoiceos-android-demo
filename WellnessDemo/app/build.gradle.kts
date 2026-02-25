@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.kangyu.wellnessdemo"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.kangyu.wellnessdemo"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
     packaging {
         resources {
@@ -58,7 +58,9 @@ dependencies {
         resolutionStrategy.cacheChangingModulesFor(1, "seconds")
     }
 
-    implementation("com.carevoice.wellness:wellness:0.11.1-SNAPSHOT")
+    implementation("com.carevoice.wellness:wellness:3.0.4")
+    implementation("com.carevoice.cvdesign:cvdesign:3.0.4")
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -3,7 +3,6 @@ package com.kangyu.wellnessdemo.ui.login.vm
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.carevoice.mindfulnesslibrary.WellnessSDK
 import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
 import com.kangyu.wellnessdemo.net.NetUtils
 import com.kangyu.wellnessdemo.net.bean.LoginRequest

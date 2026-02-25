@@ -53,8 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
-import com.carevoice.mindfulnesslibrary.WellnessSDK
-import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
 import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
 import com.kangyu.wellnessdemo.net.NetUtils

@@ -16,26 +16,46 @@ dependencyResolutionManagement {
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-releases/")
             credentials {
-                username = "Your username"
-                password = "Your password"
+                val localProps = loadLocalProperties()
+                username = System.getenv("NEXUS_USERNAME")
+                    ?: localProps.getProperty("nexusUsername", "")
+                            ?: providers.gradleProperty("nexusUsername").getOrElse("")
+                password = System.getenv("NEXUS_PASSWORD")
+                    ?: localProps.getProperty("nexusPassword", "")
+                            ?: providers.gradleProperty("nexusPassword").getOrElse("")
             }
         }
         maven {
             setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
             credentials {
-                username = "Your username"
-                password = "Your password"
+                val localProps = loadLocalProperties()
+                username = System.getenv("NEXUS_USERNAME")
+                    ?: localProps.getProperty("nexusUsername", "")
+                            ?: providers.gradleProperty("nexusUsername").getOrElse("")
+                password = System.getenv("NEXUS_PASSWORD")
+                    ?: localProps.getProperty("nexusPassword", "")
+                            ?: providers.gradleProperty("nexusPassword").getOrElse("")
             }
         }
     }
 }
 
+// This helper function is needed in settings.gradle.kts to load local.properties
+fun loadLocalProperties(): java.util.Properties {
+    val properties = java.util.Properties()
+    val localPropertiesFile = java.io.File(rootDir, "local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { properties.load(it) }
+    }
+    return properties
+}
 ```
 
 ### 2. Add the dependency in your `app/build.gradle.kts`
 ```kotlin
 dependencies {
     implementation("com.carevoice.wellness:wellness:3.0.4")
+    implementation("com.carevoice.cvdesign:cvdesign:3.0.4")
     // ... other dependencies
 }
 ```
@@ -67,7 +87,11 @@ Make sure to register your `Application` class in the `<application>` tag of you
 In your Activity or Composable, use the builder pattern to set the required parameters, then call the `init()` method.
 
 ```kotlin
+import com.carevoice.mindfulnesslibrary.Wellness
+import java.util.Locale
+
 // ...
+
 // Asynchronous call
 Wellness.setToken("your access token")
     .setTenantCode("your tenant code")
@@ -107,6 +131,9 @@ You can launch the main screen of the Wellness SDK as a new activity. This is th
 
 **Example:**
 ```kotlin
+import com.carevoice.mindfulnesslibrary.WellnessTool
+import androidx.compose.ui.platform.LocalContext
+
 // ...
 
 val context = LocalContext.current
@@ -129,7 +156,15 @@ If you want to integrate the Wellness SDK's UI seamlessly within your own Compos
 This shows how to place the `WellnessMainScreen` inside a `Column`.
 
 ```kotlin
+import com.carevoice.mindfulnesslibrary.bridgeview.WellnessMainScreen
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+
 // ...
+
 @Composable
 fun WellnessScreen() {
     Column(

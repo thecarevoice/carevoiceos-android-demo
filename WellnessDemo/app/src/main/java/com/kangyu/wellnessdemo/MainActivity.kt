@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
 import com.carevoice.cvandroid.navigation.CogniFitComposeNavigator
-import com.carevoice.mindfulnesslibrary.WellnessSDK
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.kangyu.wellnessdemo.navigation.CareVoiceNavHost
 import com.kangyu.wellnessdemo.ui.theme.WellnessDemoTheme

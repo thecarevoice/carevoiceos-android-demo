@@ -57,7 +57,7 @@ import com.carevoice.activitytracking.global.Global
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
 import com.carevoice.cvdesign.designsystem.CommonLoadingDialog
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
-import com.carevoice.mindfulnesslibrary.WellnessSDK
+import com.carevoice.mindfulnesslibrary.Wellness
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
 import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
@@ -68,6 +68,7 @@ import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
 import com.kangyu.wellnessdemo.utils.JwtUtils
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun LoginRoute(
@@ -96,38 +97,40 @@ fun LoginRoute(
                 Log.d("LoginRoute", "  accessToken: ${data.sdk.accessToken}")
                 Log.d("LoginRoute", "  refreshToken: ${data.sdk.refreshToken}")
                 Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
-                
+
                 // retrieve tenant code from access token
                 val tenantCode = JwtUtils.getTenantCodeFromJwt(data.sdk.accessToken)
                 Log.d("LoginRoute", "  parsed tenantCode: $tenantCode")
-                
+
                 // 也打印JWT解析的完整内容
                 val jwtObj = JwtUtils.parseJwt(data.sdk.accessToken)
                 Log.d("LoginRoute", "  JWT payload: $jwtObj")
-                
+
+
                 if (tenantCode != null) {
                     // 设置CareVoice SDK的生产环境URL
-                    val careVoiceBaseUrl = "https://apis.carevoiceos.com"
+                    val careVoiceBaseUrl = "http://192.168.28.22:3005/"
                     Log.d("LoginRoute", "Initializing WellnessSDK with:")
                     Log.d("LoginRoute", "  baseUrl: $careVoiceBaseUrl")
                     Log.d("LoginRoute", "  tenantCode: $tenantCode")
                     Log.d("LoginRoute", "  expiresIn: ${data.sdk.expiresIn}")
 
-                    WellnessSDK.setBaseUrl(careVoiceBaseUrl).setToken(data.sdk.accessToken)
-                        .setRefreshToken(data.sdk.refreshToken)
-                        .setExpiresIn(data.sdk.expiresIn.toLong())
-                        .setTenantCode(tenantCode).init(ctx) {
-                            Log.d("LoginRoute", "WellnessSDK init success")
-                            scope.launch {
-                                navHostController.navigate(CareVoiceScreens.Main.route) {
-                                    popUpTo(CareVoiceScreens.Login.route) { inclusive = true }
-                                }
-                            }
+
+                    scope.launch {
+                        initWellnessSDK(
+                            token = data.sdk.accessToken,
+                            data.sdk.expiresIn,
+                            data.sdk.refreshToken,
+                            tenantCode = tenantCode
+                        )
+                        navHostController.navigate(CareVoiceScreens.Main.route) {
+                            popUpTo(CareVoiceScreens.Login.route) { inclusive = true }
+                        }
                     }
 
-
                 } else {
-                    Toast.makeText(ctx, "Failed to get tenant code from token", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "Failed to get tenant code from token", Toast.LENGTH_SHORT)
+                        .show()
                     Log.e("LoginRoute", "Failed to parse tenant code from JWT token")
                     Log.e("LoginRoute", "JWT token: ${data.sdk.accessToken}")
                 }
@@ -140,7 +143,8 @@ fun LoginRoute(
                 scaffoldState.snackbarHostState.showSnackbar(errorMessage)
                 viewModel.resetLoginState()
             }
-            else->{
+
+            else -> {
 
             }
         }
@@ -154,13 +158,25 @@ fun LoginRoute(
         navHostController.navigate(CareVoiceScreens.Main.route)
     })
 
-    if (state is DataState.Loading || state is DataState.Success) CommonTheme{ CommonLoadingDialog()}
+    if (state is DataState.Loading || state is DataState.Success) CommonTheme { CommonLoadingDialog() }
+}
+
+private suspend fun initWellnessSDK(
+    token: String,
+    expiresIn: Long,
+    refreshToken: String,
+    tenantCode: String
+) {
+    Wellness.setToken(token).setTenantCode(tenantCode).setExpiresIn(expiresIn.toLong())
+        .setRefreshToken(refreshToken).setBaseUrl(CareVoiceOS.getBaseUrl())
+        .setLocale(Locale.getDefault())
+    Wellness.init() // 使用注入的 ApplicationContext
 }
 
 @Composable
 fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit, gotoMain: () -> Unit) {
     var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("12345678") }
+    var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     // 渐变背景
@@ -295,8 +311,7 @@ fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit, gotoM
                             backgroundColor = Color(0xFF6366F1)
                         ),
                         elevation = ButtonDefaults.elevation(
-                            defaultElevation = 8.dp,
-                            pressedElevation = 12.dp
+                            defaultElevation = 8.dp, pressedElevation = 12.dp
                         )
                     ) {
                         Text(
@@ -328,7 +343,7 @@ fun LoginPage(gotoRegister: () -> Unit, onClick: (String, String) -> Unit, gotoM
 @Preview
 @Composable
 fun LoginPagePreview() {
-    LoginPage(gotoRegister = {}, onClick = { _, _ -> },{
+    LoginPage(gotoRegister = {}, onClick = { _, _ -> }, {
 
     })
 }
