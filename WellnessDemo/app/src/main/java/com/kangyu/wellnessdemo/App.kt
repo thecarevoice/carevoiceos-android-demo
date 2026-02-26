@@ -10,7 +10,6 @@ class App: Application() {
     override fun onCreate() {
         super.onCreate()
         initSDK()
-
     }
 
 
@@ -18,7 +17,7 @@ class App: Application() {
 //        if (UserInfo.isLogin()) {
 //            Wellness.setToken(UserInfo.accessToken)
 //        }
-        Wellness.setLocale(Locale.getDefault()).setBaseUrl("http://192.168.28.22:3005/")
+        Wellness.setLocale(Locale.getDefault())
             .initApplication(this@App)
         Wellness.registerTokenExpiredCallback {
 //            UserInfo.logout()

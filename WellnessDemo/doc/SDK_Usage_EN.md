@@ -177,3 +177,7 @@ fun WellnessScreen() {
     }
 }
 ```
+
+### 6. Configuration
+1. The request address for login and registration is modified in the `getBaseUrl()` method in `NetUtils`.
+2. The `BaseUrl` of the Wellness SDK is modified in the `getBaseUrl()` method in `CareVoiceOS`.
