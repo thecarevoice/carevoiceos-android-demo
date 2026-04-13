@@ -1,14 +1,4 @@
----
-aside: false
----
 
-<SDKDocTabs
-  platform="CareVoiceOS Android SDK Integration Guide"
-  version="v3.1.0"
-  :versions="[
-    { value: 'v3.1.0', label: 'v3.1.0', isLatest: true, status: 'Latest' }
-  ]"
->
 
 <template #prerequisites>
 Before you begin, ensure your development environment meets the following requirements:
