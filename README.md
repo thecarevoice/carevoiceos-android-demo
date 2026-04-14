@@ -67,7 +67,7 @@ In your **app-level** `build.gradle.kts` (or `build.gradle`) file, add the SDK d
 // app/build.gradle.kts
 
 dependencies {
-    implementation("com.carevoice.wellness:wellness:3.1.0")
+    implementation("com.carevoice.wellness:wellness:3.1.1")
 }
 ```
 
@@ -378,7 +378,7 @@ private suspend fun initWellnessSDK() {
 
 <h1> 📝 Recent Release Notes</h1>
 
-### Version 3.1.0 <Badge type="tip" text="Latest" /> {#v3-1-0}
+### Version 3.1.1 <Badge type="tip" text="Latest" /> {#v3-1-1}
 
 #### 🎉 Highlights
 - Updated the Android integration guide to match the current `Wellness` / `WellnessTool` API
