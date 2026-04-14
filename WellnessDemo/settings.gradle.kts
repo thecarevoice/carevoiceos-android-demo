@@ -1,6 +1,7 @@
 import java.util.Properties
 import java.io.File
 
+
 pluginManagement {
     repositories {
         google {
@@ -32,24 +33,8 @@ dependencyResolutionManagement {
                             ?: providers.gradleProperty("nexusPassword").getOrElse("")
             }
         }
-        maven {
-            setUrl("https://nexus.kangyu.info/repository/maven-snapshots/")
-            credentials {
-                val localProps = loadLocalProperties()
-                username = System.getenv("NEXUS_USERNAME")
-                    ?: localProps.getProperty("nexusUsername", "")
-                            ?: providers.gradleProperty("nexusUsername").getOrElse("")
-                password = System.getenv("NEXUS_PASSWORD")
-                    ?: localProps.getProperty("nexusPassword", "")
-                            ?: providers.gradleProperty("nexusPassword").getOrElse("")
-            }
-        }
     }
 }
-
-rootProject.name = "WellnessDemo"
-include(":app")
-
 
 // load local.properties
 fun loadLocalProperties(): Properties {
@@ -60,3 +45,7 @@ fun loadLocalProperties(): Properties {
     }
     return properties
 }
+
+
+rootProject.name = "WellnessDemo"
+include(":app")

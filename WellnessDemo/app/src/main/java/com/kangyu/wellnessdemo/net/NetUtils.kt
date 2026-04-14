@@ -11,7 +11,8 @@ object NetUtils {
         .build()
 
     fun getBaseUrl(): String {
-        return "http://192.168.28.22:3005/"
+        //Your base url
+        return "https://p2-stag.kangyu.info/"
     }
 
     fun getApiService(): ApiService {

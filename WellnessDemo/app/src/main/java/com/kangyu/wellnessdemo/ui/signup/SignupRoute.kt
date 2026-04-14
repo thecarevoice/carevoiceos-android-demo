@@ -1,35 +1,22 @@
 package com.kangyu.wellnessdemo.ui.signup
 
-import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,29 +24,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
-import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
-import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
-import com.kangyu.wellnessdemo.net.NetUtils
-import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
-import android.widget.Toast
 import com.carevoice.cvdesign.designsystem.CommonLoadingDialog
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
+import com.carevoice.mindfulnesslibrary.ui.hubview.DataState
+import com.kangyu.wellnessdemo.navigation.CareVoiceScreens
+import com.kangyu.wellnessdemo.ui.auth.AuthFooterAction
+import com.kangyu.wellnessdemo.ui.auth.AuthPrimaryButton
+import com.kangyu.wellnessdemo.ui.auth.AuthScreen
+import com.kangyu.wellnessdemo.ui.auth.AuthTextField
+import com.kangyu.wellnessdemo.ui.auth.SignupAuthPalette
+import com.kangyu.wellnessdemo.ui.signup.vm.SignupViewModel
+import com.kangyu.wellnessdemo.ui.theme.WellnessDemoTheme
 
 @Composable
 fun SignupRoute(
@@ -73,20 +58,16 @@ fun SignupRoute(
 
     LaunchedEffect(state) {
         when (state) {
-            DataState.Loading -> {
-                // Handle loading state
-            }
-            
+            DataState.Loading -> Unit
+
             is DataState.Success -> {
-                // Handle success state - show success message and navigate to login
-                Toast.makeText(ctx, "Registration successful! Please login.", Toast.LENGTH_SHORT).show()
-                
-                // Reset the signup state to avoid repeated navigation
+                Toast.makeText(
+                    ctx,
+                    "Registration successful! Please login.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 signupViewModel.resetState()
-                
-                // Navigate to login screen
                 navHostController.navigate(CareVoiceScreens.Login.route) {
-                    // Clear the signup screen from back stack
                     popUpTo(CareVoiceScreens.SignUp.route) {
                         inclusive = true
                     }
@@ -94,18 +75,18 @@ fun SignupRoute(
             }
 
             is DataState.Error -> {
-                // Handle error state
-                val errorMessage = (state as DataState.Error).message
-                Toast.makeText(ctx, "Registration failed: $errorMessage", Toast.LENGTH_LONG).show()
+                val errorMessage = (state as DataState.Error).message.ifBlank {
+                    "Registration failed"
+                }
+                Toast.makeText(ctx, errorMessage, Toast.LENGTH_LONG).show()
+                scaffoldState.snackbarHostState.showSnackbar(errorMessage)
                 signupViewModel.resetState()
             }
-            
-            DataState.Idle -> {
-                // Idle state - do nothing
-            }
+
+            DataState.Idle -> Unit
         }
     }
-    
+
     RegisterPage(
         onClick = { userName, password ->
             signupViewModel.signup(userName, password)
@@ -116,238 +97,164 @@ fun SignupRoute(
             }
         }
     )
-    
-    // Show loading dialog when in loading state
+
     if (state is DataState.Loading) {
-        CommonTheme { 
+        CommonTheme {
             CommonLoadingDialog()
         }
     }
 }
 
 @Composable
-fun RegisterPage(onClick: (String, String) -> Unit, onBackToLogin: () -> Unit) {
+fun RegisterPage(
+    onClick: (String, String) -> Unit,
+    onBackToLogin: () -> Unit
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    // 渐变背景（绿色系）
-    val gradientBrush = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFF10B981), // 绿色
-            Color(0xFF059669), // 深绿色
-            Color(0xFF047857)  // 更深的绿色
-        )
-    )
+    val passwordsMatch = password == confirmPassword
+    val confirmTouched = confirmPassword.isNotBlank()
+    val canSubmit = username.isNotBlank() &&
+        password.isNotBlank() &&
+        confirmPassword.isNotBlank() &&
+        passwordsMatch
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(gradientBrush)
+    AuthScreen(
+        palette = SignupAuthPalette,
+        eyebrow = "CareVoice OS",
+        title = "Create your account",
+        formTitle = "Get started",
+        formDescription = "Use a work email so your account is ready to sign in across devices."
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Logo/品牌区域
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(bottom = 32.dp)
-            ) {
-                Text(
-                    text = "CareVoice",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            AuthTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = "Email",
+                leadingIcon = Icons.Default.Email,
+                accentColor = SignupAuthPalette.accent,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
                 )
-                Text(
-                    text = "Create Your Account",
-                    fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
+            )
 
-            // 注册卡片
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp)),
-                elevation = 16.dp,
-                backgroundColor = Color.White
-            ) {
-                Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Sign Up",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1F2937),
-                        modifier = Modifier.padding(bottom = 24.dp)
-                    )
-
-                    // 用户名输入框
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
-                        label = { Text("Email Address", color = Color(0xFF6B7280)) },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Email,
-                                contentDescription = "Email",
-                                tint = Color(0xFF10B981)
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF10B981),
-                            unfocusedBorderColor = Color(0xFFE5E7EB),
-                            backgroundColor = Color(0xFFF9FAFB)
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 密码输入框
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password", color = Color(0xFF6B7280)) },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Password",
-                                tint = Color(0xFF10B981)
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                                    tint = Color(0xFF6B7280)
-                                )
+            AuthTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = "Password",
+                leadingIcon = Icons.Default.Lock,
+                accentColor = SignupAuthPalette.accent,
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            imageVector = if (passwordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = if (passwordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
                             }
-                        },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF10B981),
-                            unfocusedBorderColor = Color(0xFFE5E7EB),
-                            backgroundColor = Color(0xFFF9FAFB)
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 确认密码输入框
-                    OutlinedTextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        label = { Text("Confirm Password", color = Color(0xFF6B7280)) },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Confirm Password",
-                                tint = Color(0xFF10B981)
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                                Icon(
-                                    imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password",
-                                    tint = Color(0xFF6B7280)
-                                )
-                            }
-                        },
-                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = Color(0xFF10B981),
-                            unfocusedBorderColor = Color(0xFFE5E7EB),
-                            backgroundColor = Color(0xFFF9FAFB)
-                        )
-                    )
-
-                    // 密码匹配提示
-                    if (password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword) {
-                        Text(
-                            text = "Passwords do not match",
-                            color = Color(0xFFEF4444),
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+                },
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                )
+            )
 
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // 注册按钮
-                    Button(
-                        onClick = { 
-                            if (password == confirmPassword) {
-                                onClick.invoke(username, password)
+            AuthTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = "Confirm password",
+                leadingIcon = Icons.Default.Lock,
+                accentColor = SignupAuthPalette.accent,
+                trailingIcon = {
+                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        Icon(
+                            imageVector = if (confirmPasswordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                            contentDescription = if (confirmPasswordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
                             }
-                        },
-                        enabled = username.isNotEmpty() && password.isNotEmpty() && password == confirmPassword,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF10B981),
-                            disabledBackgroundColor = Color(0xFFE5E7EB)
-                        ),
-                        elevation = ButtonDefaults.elevation(
-                            defaultElevation = 8.dp,
-                            pressedElevation = 12.dp
-                        )
-                    ) {
-                        Text(
-                            text = "Sign Up",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 登录链接
-                    Text(
-                        text = "Already have an account? Sign in",
-                        modifier = Modifier.clickable { onBackToLogin() },
-                        color = Color(0xFF10B981),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+                },
+                visualTransformation = if (confirmPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (canSubmit) onClick(username.trim(), password)
+                    }
+                ),
+                isError = confirmTouched && !passwordsMatch
+            )
         }
+
+        Text(
+            text = when {
+                !confirmTouched -> "Use at least 8 characters for a stronger password."
+                passwordsMatch -> "Passwords match and your account is ready to be created."
+                else -> "The passwords do not match yet."
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = when {
+                !confirmTouched -> SignupAuthPalette.body
+                passwordsMatch -> SignupAuthPalette.accentStrong
+                else -> MaterialTheme.colorScheme.error
+            }
+        )
+
+        AuthPrimaryButton(
+            text = "Create account",
+            accentColor = SignupAuthPalette.accent,
+            enabled = canSubmit,
+            onClick = { onClick(username.trim(), password) }
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        AuthFooterAction(
+            prompt = "Already registered?",
+            actionLabel = "Back to sign in",
+            accentColor = SignupAuthPalette.accent,
+            onActionClick = onBackToLogin
+        )
     }
 }
 
-// Preview
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun RegisterPagePreview() {
-    RegisterPage(
-        onClick = { _, _ -> },
-        onBackToLogin = { }
-    )
+private fun RegisterPagePreview() {
+    WellnessDemoTheme {
+        RegisterPage(
+            onClick = { _, _ -> },
+            onBackToLogin = {}
+        )
+    }
 }

@@ -58,8 +58,8 @@ dependencies {
         resolutionStrategy.cacheChangingModulesFor(1, "seconds")
     }
 
-    implementation("com.carevoice.wellness:wellness:3.0.4")
-    implementation("com.carevoice.cvdesign:cvdesign:3.0.4")
+    implementation("com.carevoice.wellness:wellness:3.1.1")
+    implementation("com.carevoice.cvdesign:cvdesign:3.1.1")
 
 
     implementation(libs.androidx.core.ktx)
