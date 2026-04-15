@@ -45,6 +45,9 @@ android {
         kotlinCompilerExtensionVersion = "1.4.8"
     }
     packaging {
+        jniLibs {
+            excludes += "lib/arm64-v8a/librtmp-jni.so"
+        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -60,6 +63,14 @@ dependencies {
 
     implementation("com.carevoice.wellness:wellness:3.1.1")
     implementation("com.carevoice.cvdesign:cvdesign:3.1.1")
+
+    // Override CameraX to a 16 KB-compatible native build.
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.extensions)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.video)
+    implementation(libs.androidx.camera.view)
 
 
     implementation(libs.androidx.core.ktx)
