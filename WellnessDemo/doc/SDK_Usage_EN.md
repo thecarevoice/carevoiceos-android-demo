@@ -53,12 +53,22 @@ fun loadLocalProperties(): java.util.Properties {
 
 ### 2. Add the dependency in your `app/build.gradle.kts`
 ```kotlin
+android {
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
 dependencies {
     implementation("com.carevoice.wellness:wellness:3.0.4")
     implementation("com.carevoice.cvdesign:cvdesign:3.0.4")
     // ... other dependencies
 }
 ```
+
+The `packaging.jniLibs.useLegacyPackaging = true` setting is required.
 
 ### 3. Initialize the SDK in your Application class
 Initialize the `Wellness` SDK in the `onCreate` method of your `Application` class.

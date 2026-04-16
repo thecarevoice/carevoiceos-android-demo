@@ -1,4 +1,14 @@
+---
+aside: false
+---
 
+<SDKDocTabs
+  platform="CareVoiceOS Android SDK Integration Guide"
+  version="v3.1.1"
+  :versions="[
+    { value: 'v3.1.1', label: 'v3.1.1', isLatest: true, status: 'Latest' }
+  ]"
+>
 
 <template #prerequisites>
 Before you begin, ensure your development environment meets the following requirements:
@@ -39,7 +49,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
-
         maven {
             url = uri("https://nexus.kangyu.info/repository/maven-releases/")
             credentials {
@@ -66,10 +75,20 @@ In your **app-level** `build.gradle.kts` (or `build.gradle`) file, add the SDK d
 ```kotlin
 // app/build.gradle.kts
 
+android {
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
 dependencies {
     implementation("com.carevoice.wellness:wellness:3.1.1")
 }
 ```
+
+The `packaging.jniLibs.useLegacyPackaging = true` setting is required.
 
 If you consume a release build instead of a snapshot build, replace the version with the published release version provided by CareVoice.
 
@@ -387,6 +406,7 @@ private suspend fun initWellnessSDK() {
 
 #### 🐛 Bug Fixes
 - Restored SDK token pre-refresh support when `setRefreshToken(...)` and `setExpiresIn(...)` are provided together
+
 
 </div>
 

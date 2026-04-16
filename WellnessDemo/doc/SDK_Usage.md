@@ -54,12 +54,22 @@ fun loadLocalProperties(): Properties {
 ### 2. 在 `app/build.gradle.kts` 中添加依赖
 
 ```kotlin
+android {
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
 dependencies {
     implementation("com.carevoice.wellness:wellness:3.0.4")
     implementation("com.carevoice.cvdesign:cvdesign:3.0.4")
     // ... other dependencies
 }
 ```
+
+其中 `packaging.jniLibs.useLegacyPackaging = true` 为必填配置。
 
 ### 3. 在 Application 类中初始化 SDK
 
