@@ -80,7 +80,8 @@ fun LoginRoute(
                 Log.d("LoginRoute", "  JWT payload: ${JwtUtils.parseJwt(data.sdk.accessToken)}")
 
                 if (tenantCode != null) {
-                    val careVoiceBaseUrl = CareVoiceOS.getBaseUrl()
+                    //Your Base Url for WellnessSDK
+                    val careVoiceBaseUrl = "https://apis.carevoiceos.com/"
                     Log.d("LoginRoute", "Initializing WellnessSDK with:")
                     Log.d("LoginRoute", "  baseUrl: $careVoiceBaseUrl")
                     Log.d("LoginRoute", "  tenantCode: $tenantCode")
