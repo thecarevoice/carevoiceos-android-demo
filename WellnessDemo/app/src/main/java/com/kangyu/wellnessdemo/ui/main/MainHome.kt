@@ -42,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.carevoice.cvandroid.navigation.AppComposeNavigator
 import com.carevoice.cvdesign.designsystem.modifier.containWindowInseTop
 import com.carevoice.cvdesign.designsystem.theme.CommonTheme
+import com.carevoice.mindfulnesslibrary.Wellness
 import com.carevoice.mindfulnesslibrary.WellnessTool
 import com.carevoice.mindfulnesslibrary.bridgeview.WellnessMainScreen
 //import com.carevoice.mindfulnesslibrary.navigation.WellnessAreaScreens
@@ -64,6 +65,12 @@ fun MainHome(
 ) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(0, pageCount = { 3 })
+
+    LaunchedEffect(Unit) {
+        Wellness.registerConsentGateCallback {
+            //Refusal of the agreement
+        }
+    }
     
     // 底部导航项目
     val bottomNavItems = listOf(
