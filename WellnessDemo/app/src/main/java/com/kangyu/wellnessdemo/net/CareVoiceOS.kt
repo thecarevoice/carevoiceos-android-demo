@@ -5,6 +5,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object CareVoiceOS {
     fun getBaseUrl(): String {
-        return "http://localhost:3005/"
+        return "https://apis.carevoiceos.com/"
     }
 }
